@@ -1,0 +1,53 @@
+#!/bin/sh
+
+
+function display_usage_text() {
+    cat << EOF
+This script prints the list of addresses of remote repositories for all local repositories in the current folder.
+
+Usage:
+     -h|--help                  Displays this help
+EOF
+}
+
+
+function list_remote_origin_url() {
+    for dir in *
+    do
+        url=`[ -d "$dir" ] && [ -d "$dir/.git" ] && git --git-dir "$dir/.git" config --get remote.origin.url`
+        echo $dir - $url
+    done
+}
+
+
+function exit_with_message() {
+    printf '%s\n' "$1"
+    exit 0
+}
+
+
+function parse_params() {
+    local param
+    while [[ $# -gt 0 ]]; do
+        param="$1"
+        shift
+        case $param in
+            -h|--help)
+                display_usage_text
+                exit 0
+                ;;
+            *)
+                exit_with_message "Invalid parameter was provided: $param"
+                ;;
+        esac
+    done
+}
+
+
+function main() {
+    parse_params "$@"
+    list_remote_origin_url
+}
+
+
+main "$@"
